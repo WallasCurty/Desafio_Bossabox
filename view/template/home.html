@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Bossabox</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
+</head>
+<body>
+<h1>Cadastro</h1>
+<section id="formulario-insercao-todo">
+    <form id="form-inserir" action="
+            {% if todo_atualizar %}{{ url_for('atualizar', id=todo_atualizar.id) }}{% else %}{{ url_for('inserir') }}{% endif %}"
+          method="post" enctype="application/x-www-form-urlencoded" onsubmit="return inserir()">
+        <label for="todo-titulo">Título:</label>
+        <input id="todo-titulo" type="text" name="titulo"
+               value="{% if todo_atualizar %}{{ todo_atualizar.titulo }}{% else %} {{ '' }} {% endif %}">
+        <label for="todo-data">Data:</label>
+        <input id="todo-data" type="datetime-local" name="data" value="
+                {% if todo_atualizar %}{{ todo_atualizar.data.strftime('%Y-%m-%dT%H:%M') }}{% else %} {{ '' }} {% endif %}"/>
+        <label for="todo-descricao">Descrição</label>
+        <textarea id="todo-descricao" name="descricao">{% if todo_atualizar %}{{ todo_atualizar.descricao }}{% else %}
+            {{ '' }} {% endif %}</textarea>
+        <input type="submit">
+    </form>
+</section>
+<h1>Lista de Cadastros</h1>
+<section id="formulario-busca-todo">
+    <form action="{{ url_for('busca') }}" method="get" enctype="application/x-www-form-urlencoded"
+          onsubmit="return buscar()">
+        <label for="todo-palavrachave">Buscar:</label>
+        <input type="text" id='todo-palavrachave' name="palavra_chave"
+               value="{{ palavra_chave if palavra_chave != None else '' }}">
+        <input type="submit"/>
+    </form>
+</section>
+<section id="lista-todos">
+    <section class="todo">
+        <p>Carregando seus cadastros a serem resolvidos</p>
+    </section>
+</section>
+<script>
+    
+    xhr = new XMLHttpRequest();
+    xhr.open("GET", "/list");
+    xhr.send(null);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            document.getElementById("lista-todos").innerHTML = xhr.response;
+        }
+    }
+
+
+
+
+    function buscar() {
+        palavraChave = document.getElementById("todo-palavrachave").value;
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/busca?palavra_chave=" + palavraChave);
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                document.getElementById("lista-todos").innerHTML = xhr.response;
+            }
+        }
+
+        return false;
+    }
+
+
+
+
+    function inserir() {
+        xhr = new XMLHttpRequest();
+        xhr.open("POST", "/inserir");
+        formularioHtml = document.getElementById("form-inserir")
+        formData = new FormData(formularioHtml);
+        xhr.send(formData);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                document.getElementById("lista-todos").innerHTML = xhr.response;
+            }
+        }
+        return false;
+    }
+
+
+
+
+    function excluir(id) {
+        xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "excluir/" + id);
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                document.getElementById("lista-todos").innerHTML = xhr.response;
+            }
+        }
+    }
+</script>
+</body>
+</html>
