@@ -1,0 +1,13 @@
+{% for todo in todo_list %}
+    <section class="todo" id="todo-{{ todo.id }}">
+        <header>
+            <h2>{{ todo.titulo }}</h2>
+            <p>{{ todo.data }}</p>
+        </header>
+        <article>{{ todo.descricao }}</article>
+        <footer>
+            <!--<a id="botao-excluir" onclick="excluir({{ todo.id }})" class="botao-excluir">Excluir</a> -->
+            <a class="botao-atualizar" href="{{ url_for('atualizar', id=todo.id) }}">Atualizar</a>
+        </footer>
+    </section>
+{% endfor %}
